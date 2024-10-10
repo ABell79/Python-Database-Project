@@ -1,0 +1,47 @@
+def display_table():
+    root_table = Tk()
+    root_table.title("Data Table")
+    root_table.geometry("1000x500")
+
+    tree = ttk.Treeview(root_table, column=("column0", "column1", "column2", "column3", "column4", "column5", "column6"))
+    tree.heading("#0", text="Company Name")
+    tree.heading("#1", text="Email")
+    tree.heading("#2", text="Contact Number")
+    tree.heading("#3", text="Contact Name")
+    tree.heading("#4", text="Available Resources")
+    tree.heading("#5", text="Organization Type")
+    tree.heading("#6", text="Other")
+    tree.grid(row=1, column=0, columnspan=2)
+
+    conn = sqlite3.connect("compData.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT coName, email, phonNum, conName, availRes, orgType, other FROM comps")  # Adjusted column names
+    data = cursor.fetchall()
+    for row in data:
+        tree.insert("", END, values=row)
+    conn.close()
+
+    root_table.mainloop()
+
+
+def insert_data():
+    coname = company_name_entry.get()
+    email = email_name_entry.get()
+    phonnum = phone_entry.get()
+    conname = contact_name_entry.get()
+    availres = resources_entry.get()
+    orgtype = organization_type_entry.get()
+    other = other_entry.get()
+
+
+    if coname and email and phonnum and availres and availres and orgtype and other:
+        conn = sqlite3.connect("compData.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO comps (coname, email, phonnum, conname, availres, orgtype, other) VALUES (?,?,?,?,?,?,?)", (coname, email, phonnum, conname, availres, orgtype, other))
+        cursor.execute("SELECT coname, email, phonnum, conname, availres, orgtype, other FROM comps")
+        data = cursor.fetchall()
+        for row in data:
+            print(row)
+            tree.insert("", END, values=row)
+        print(data)
+        conn.commit()
